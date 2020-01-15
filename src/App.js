@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 
-function App() {
+import DevForm from './components/DevForm';
+import DevItem from './components/DevItem';
+import api from './services/api';
+
+import './global.css';
+import './App.css';
+import './Sidebar.css';
+import './Main.css';
+
+export default function App() {
+  const [devs, setDevs] = useState([]);
+
+  useEffect(() => {
+    async function loadDevs() {
+      const response = await api.get('/devs');
+
+      setDevs(response.data);
+    }
+
+    loadDevs();
+  }, []);
+
+  function addDev(dev) {
+    setDevs([...devs, dev]);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div id="app">
+      <aside>
+        <strong>Cadastrar</strong>
+        <DevForm onAddDev={addDev} />
+      </aside>
+      <main>
+        <ul>
+          {devs.map(dev => (<DevItem info={dev} key={dev._id}/>))}
+        </ul>
+      </main>
     </div>
   );
 }
-
-export default App;
