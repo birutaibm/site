@@ -14,13 +14,32 @@ li.dev-item header {
 }
 
 li.dev-item header img {
-  widows: 54px;
+  width: 54px;
   height: 54px;
   border-radius: 50%;
 }
 
 li.dev-item header .user-info {
   margin-left: 10px;
+  flex: 1;
+}
+
+li.dev-item header .menu {
+  margin-left: 10px;
+  width: 27px;
+  height: 54px;
+}
+
+.menu .menu-item {
+  width: 24px;
+  height: 24px;
+  border: 0px;
+  background-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
+}
+
+.menu .menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .user-info strong {

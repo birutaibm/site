@@ -10,31 +10,68 @@ import './Sidebar.css';
 import './Main.css';
 
 export default function App() {
+  const [position, setPosition] = useState({latitude:'', longitude:''})
   const [devs, setDevs] = useState([]);
+  const [editingDev, setEditingDev] = useState(null);
 
   useEffect(() => {
-    async function loadDevs() {
-      const response = await api.get('/devs');
-
-      setDevs(response.data);
-    }
-
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        const pos = {latitude, longitude};
+        setPosition(pos);
+      },
+      err => console.log(err),
+      {timeout: 30000}
+    );
+    
     loadDevs();
   }, []);
 
-  function addDev(dev) {
-    setDevs([...devs, dev]);
+  async function loadDevs() {
+    const response = await api.get('/devs');
+
+    setDevs(response.data);
+  }
+
+  async function removeDev(id) {
+    await api.delete('/devs/'+id);
+
+    loadDevs();
+  }
+
+  async function editDev(id) {
+    const dev = devs.find(d => d._id === id);
+    setEditingDev(dev);
+  }
+  
+  async function saveDev(dev) {
+    if (editingDev) {
+      await api.put('/devs/'+editingDev._id, dev);
+      setEditingDev(null);
+    } else {
+      await api.post('/devs', dev);
+    }
+
+    loadDevs();
   }
 
   return (
     <div id="app">
       <aside>
         <strong>Cadastrar</strong>
-        <DevForm onAddDev={addDev} />
+        <DevForm saveDev={saveDev} position={position} values={editingDev}/>
       </aside>
       <main>
         <ul>
-          {devs.map(dev => (<DevItem info={dev} key={dev._id}/>))}
+          {devs.map(dev => (
+            <DevItem
+              key={dev._id}
+              info={dev}
+              remove={() => removeDev(dev._id)}
+              edit={() => editDev(dev._id)}
+            />
+          ))}
         </ul>
       </main>
     </div>
